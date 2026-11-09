@@ -30,5 +30,11 @@ Informatik und Technik für persischsprachige Zuschauer:
 Content-Manager, Ideensammler, Skript- und Caption-Schreiber, Video-Editor/Cutter,
 Grafikdesigner, Thumbnail-Ersteller.
 
+## Rahmenbedingungen
+- Auftritt: Gesicht + Stimme vor der Kamera
+- Zielgruppe: Afghanistan (Dari), Iran (Farsi), persischsprachige Diaspora in Europa, Anfänger/Schüler
+- Startpunkt: Ganz neu (0 Follower)
+- Zeitbudget: 5–10 Std. pro Woche (neben der Ausbildung)
+
 ## Offene Fragen
 (werden ergänzt)
