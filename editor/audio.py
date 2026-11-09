@@ -64,7 +64,29 @@ def sfx_typing(d=1.0):
         t += rng.uniform(0.06, 0.11)
     return y
 
-SFX = {"whoosh": sfx_whoosh, "swish": sfx_swish, "pop": sfx_pop, "click": sfx_click,
+def sfx_glitch():
+    n = int(0.35 * SR); y = np.zeros(n)
+    i = 0
+    while i < n:
+        L = int(rng.uniform(0.01, 0.05) * SR)
+        f = rng.uniform(200, 2000)
+        seg = np.sign(np.sin(2 * np.pi * f * np.arange(L) / SR)) * rng.uniform(.2, .6)
+        y[i:i + L] = seg[: n - i]
+        i += L + int(rng.uniform(0, .02) * SR)
+    return 0.6 * y
+
+def sfx_riser(d=1.6):
+    n = int(d * SR); t = np.linspace(0, 1, n)
+    x = lowpass(rng.standard_normal(n), 200 + 7000 * t ** 2)
+    tone = np.sin(2 * np.pi * np.cumsum(200 + 900 * t ** 2) / SR)
+    return (0.5 * x / np.abs(x).max() + 0.25 * tone) * t ** 2
+
+def sfx_drop():
+    n = int(1.2 * SR); t = np.arange(n) / SR
+    f = 70 * np.exp(-t * 2.5) + 30
+    return 1.0 * np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 2.2)
+
+SFX = {"glitch": sfx_glitch, "riser": sfx_riser, "drop": sfx_drop, "whoosh": sfx_whoosh, "swish": sfx_swish, "pop": sfx_pop, "click": sfx_click,
        "ding": sfx_ding, "boom": sfx_boom, "typing": sfx_typing}
 
 # ---------- music: calm lo-fi loop (Am - F - C - G) ----------
@@ -108,7 +130,13 @@ def main():
     mix = np.zeros((n, 2))
     if mcfg.get("gainDb") is not None:
         m = music(D, mcfg.get("bpm", 96))
-        mix += m / np.abs(m).max() * 10 ** (mcfg["gainDb"] / 20)
+        m = m / np.abs(m).max() * 10 ** (mcfg["gainDb"] / 20)
+        for c in mcfg.get("cuts", []):  # dramatic pauses: music off, soft fade back in
+            a, b = int(c[0] * SR), int(c[1] * SR)
+            m[a:b] = 0
+            fade = min(int(.4 * SR), n - b)
+            if fade > 0: m[b:b + fade] *= np.linspace(0, 1, fade)[:, None]
+        mix += m
     for e in tl.get("sfx", []):
         f = SFX[e["name"]]
         s = f(e["dur"]) if "dur" in e else f()
