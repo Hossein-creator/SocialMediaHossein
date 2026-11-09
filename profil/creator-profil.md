@@ -36,5 +36,10 @@ Grafikdesigner, Thumbnail-Ersteller.
 - Startpunkt: Ganz neu (0 Follower)
 - Zeitbudget: 5–10 Std. pro Woche (neben der Ausbildung)
 
+- Equipment: Smartphone, externes Mikrofon, PC/Laptop für Bildschirmaufnahmen
+- Schnitt: CapCut
+- Kanalname: noch offen (Vorschläge siehe strategie/strategie-v1.md)
+- Persönliche Story (Afghane, IT-Ausbildung in Deutschland): ja, als Nebenthema
+
 ## Offene Fragen
-(werden ergänzt)
+- Kanalname festlegen
