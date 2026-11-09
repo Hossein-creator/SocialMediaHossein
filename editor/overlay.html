@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>IT Sade Overlay</title>
+<style>
+@font-face{font-family:VL;font-weight:400;src:url(../design/fonts/vazirmatn-latin-400-normal.woff2) format("woff2");}
+@font-face{font-family:VL;font-weight:700;src:url(../design/fonts/vazirmatn-latin-700-normal.woff2) format("woff2");}
+@font-face{font-family:VL;font-weight:900;src:url(../design/fonts/vazirmatn-latin-900-normal.woff2) format("woff2");}
+@font-face{font-family:VA;font-weight:400;src:url(../design/fonts/vazirmatn-arabic-400-normal.woff2) format("woff2");}
+@font-face{font-family:VA;font-weight:700;src:url(../design/fonts/vazirmatn-arabic-700-normal.woff2) format("woff2");}
+@font-face{font-family:VA;font-weight:900;src:url(../design/fonts/vazirmatn-arabic-900-normal.woff2) format("woff2");}
+:root{--bg:#0B1220;--panel:rgba(11,18,32,.82);--accent:#22D3EE;--hi:#FACC15;--text:#F8FAFC;--muted:#94A3B8;--ok:#22C55E;--red:#F43F5E;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;background:transparent;overflow:hidden;}
+body{font-family:VL,VA,sans-serif;color:var(--text);position:relative;}
+.abs{position:absolute;}
+.emoji{display:inline-block;vertical-align:middle;}
+.hi{color:var(--hi);}
+.ac{color:var(--accent);}
+.mono{font-family:"DejaVu Sans Mono",monospace;direction:ltr;unicode-bidi:isolate;letter-spacing:1px;}
+/* progress + brand */
+#progress{top:0;right:0;height:10px;background:var(--accent);box-shadow:0 0 18px var(--accent);}
+#brand{top:180px;left:60px;font-weight:900;font-size:34px;padding:8px 26px;border-radius:999px;background:rgba(34,211,238,.92);color:var(--bg);}
+/* subtitles */
+#sub{left:60px;right:60px;top:1380px;text-align:center;font-weight:900;font-size:76px;line-height:1.35;
+  color:#fff;-webkit-text-stroke:14px #000;paint-order:stroke fill;text-shadow:0 8px 24px rgba(0,0,0,.55);}
+#sub b{color:var(--hi);}
+/* generic panel */
+.panel{background:var(--panel);border:3px solid rgba(34,211,238,.55);border-radius:44px;box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 40px rgba(34,211,238,.18);backdrop-filter:blur(6px);}
+/* hook */
+.hook{left:0;right:0;top:330px;text-align:center;}
+.hook .t{position:relative;display:inline-block;font-weight:900;font-size:140px;line-height:1.2;padding:10px 50px 26px;border-radius:40px;background:rgba(11,18,32,.88);border:4px solid var(--hi);box-shadow:0 0 60px rgba(250,204,21,.35);}
+.hook .t b{color:var(--hi);}
+.hook .t img{width:130px;height:130px;position:absolute;top:-80px;left:-60px;}
+/* card */
+.card{left:90px;right:90px;top:930px;padding:40px 50px;display:flex;align-items:center;gap:40px;}
+.card img{width:170px;height:170px;flex:none;}
+.card .l{font-weight:900;font-size:96px;line-height:1.1;color:var(--accent);}
+.card .x{font-weight:700;font-size:62px;line-height:1.3;}
+.card .m{margin-top:14px;font-size:46px;color:var(--hi);min-height:56px;}
+/* compare */
+.compare{left:60px;right:60px;top:740px;}
+.compare .row{display:flex;gap:30px;align-items:center;justify-content:center;}
+.compare .box{width:400px;padding:30px 20px;text-align:center;}
+.compare .box img{width:120px;height:120px;}
+.compare .box .n{font-weight:900;font-size:52px;margin-top:6px;}
+.compare .box .ip{font-size:36px;white-space:nowrap;color:var(--hi);margin-top:8px;}
+.compare .arrow{font-size:90px;font-weight:900;color:var(--accent);}
+.compare .mac{margin:30px auto 0;width:900px;padding:22px 30px;display:flex;align-items:center;justify-content:center;gap:24px;font-weight:700;font-size:46px;border-color:rgba(34,197,94,.8);}
+.compare .mac img{width:70px;height:70px;}
+/* split */
+.split{left:90px;right:90px;top:900px;}
+.split .r{display:flex;align-items:center;gap:34px;padding:30px 44px;margin-bottom:34px;}
+.split .r img{width:120px;height:120px;}
+.split .r .a{font-weight:700;font-size:58px;flex:1;}
+.split .r .b{font-weight:900;font-size:80px;color:var(--hi);}
+/* cta */
+.cta{left:110px;right:110px;top:860px;padding:40px 50px 56px;text-align:center;}
+.cta .k{font-weight:700;font-size:48px;color:var(--accent);}
+.cta .x{font-weight:900;font-size:92px;margin:6px 0 34px;}
+.cta .btn{display:inline-flex;align-items:center;gap:18px;font-weight:900;font-size:60px;padding:18px 70px;border-radius:999px;background:var(--red);color:#fff;position:relative;}
+.cta .hand{position:absolute;width:120px;height:120px;bottom:-110px;left:50%;}
+/* flash */
+#flash{inset:0;background:#fff;opacity:0;}
+</style>
+</head>
+<body>
+<div id="flash" class="abs"></div>
+<div id="layer"></div>
+<div id="brand" class="abs"></div>
+<div id="progress" class="abs"></div>
+<div id="sub" class="abs"></div>
+<script>
+// ---------- helpers ----------
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const easeOutBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
+const easeOut=x=>1-Math.pow(1-x,3);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=s=>esc(s).replace(/\*(.+?)\*/g,"<b>$1</b>").replace(/\|/g,"<br>");
+const em=(code,cls="emoji")=>`<img class="${cls}" src="assets/emoji/${code}.svg">`;
+// enter/exit transform for an element active in [t0,t1]
+function life(el,t,t0,t1,{enter=.35,exit=.25,from="scale"}={}){
+  if(t<t0||t>t1){el.style.display="none";return 0;}
+  el.style.display="";
+  const a=clamp((t-t0)/enter), b=clamp((t1-t)/exit);
+  const k=Math.min(a<1?easeOutBack(a):1, b<1?easeOut(b):1);
+  const o=Math.min(clamp(a*2),clamp(b));
+  el.style.opacity=o;
+  if(from==="scale") el.style.transform=`scale(${.6+.4*k})`;
+  else if(from==="up") el.style.transform=`translateY(${(1-k)*120}px)`;
+  return a;
+}
+function stagger(el,t,start){ // child appears at absolute time start
+  const a=clamp((t-start)/.3);
+  el.style.opacity=clamp(a*1.5);
+  el.style.transform=`translateY(${(1-easeOutBack(a))*60}px) scale(${.85+.15*easeOutBack(a)})`;
+}
+function typed(el,t,start,text,cps=14){
+  const n=Math.floor(clamp((t-start)*cps,0,text.length));
+  el.textContent=text.slice(0,n)+(n<text.length&&t>=start?"▌":"");
+}
+
+// ---------- build ----------
+let TL, nodes=[], subChunks=[];
+function chunkSubs(subs,maxWords=4){
+  const out=[];
+  for(const s of subs){
+    const words=s.text.match(/\*[^*]+\*\S*|\S+/g)||[];
+    const groups=[];
+    for(let i=0;i<words.length;i+=maxWords) groups.push(words.slice(i,i+maxWords));
+    // keep * pairs balanced inside a chunk
+    const total=groups.reduce((n,g)=>n+g.join(" ").length,0);
+    let t=s.t0;
+    for(const g of groups){
+      const txt=g.join(" "); const d=(s.t1-s.t0)*txt.length/total;
+      out.push({t0:t,t1:t+d,text:txt}); t+=d;
+    }
+  }
+  return out;
+}
+function build(tl){
+  TL=tl;
+  document.getElementById("brand").textContent=tl.brand||"";
+  subChunks=chunkSubs(tl.subtitles||[], tl.subtitleWords||4);
+  const layer=document.getElementById("layer");
+  for(const e of tl.elements||[]){
+    const d=document.createElement("div"); d.className="abs "+e.type; let h="";
+    if(e.type==="hook") h=`<div class="t">${fmt(e.title)}${e.emoji?em(e.emoji,"bob"):""}</div>`;
+    if(e.type==="card"){ d.classList.add("panel");
+      h=`${em(e.emoji)}<div><div class="l">${fmt(e.label)}</div><div class="x">${fmt(e.text)}</div>${e.mono?'<div class="m mono"></div>':""}</div>`;}
+    if(e.type==="compare"){
+      h=`<div class="row"><div class="box panel s1">${em(e.a.emoji)}<div class="n">${fmt(e.a.title)}</div><div class="ip mono">${esc(e.a.value)}</div></div>
+         <div class="arrow s2">←</div>
+         <div class="box panel s3">${em(e.b.emoji)}<div class="n">${fmt(e.b.title)}</div><div class="ip mono">${esc(e.b.value)}</div></div></div>
+         <div class="mac panel s4">${em("2705")}<span>${fmt(e.footer)}</span></div>`;}
+    if(e.type==="split") h=e.rows.map((r,i)=>`<div class="r panel s${i+1}">${em(r.emoji)}<div class="a">${fmt(r.a)}</div><div class="b">${fmt(r.b)}</div></div>`).join("");
+    if(e.type==="cta"){ d.classList.add("panel");
+      h=`<div class="k">${fmt(e.kicker)}</div><div class="x">${fmt(e.title)}</div><div class="btn"><span class="bt">${fmt(e.button)}</span>${em("1f446","hand")}</div>`;}
+    d.innerHTML=h; layer.appendChild(d); nodes.push({e,d});
+  }
+}
+
+// ---------- render at time t ----------
+function setTime(t){
+  const D=TL.duration;
+  document.getElementById("progress").style.width=(1080*clamp(t/D))+"px";
+  // flash on cuts
+  let f=0; for(const c of TL.flashes||[]){ if(t>=c&&t<c+.18) f=Math.max(f,.55*(1-(t-c)/.18)); }
+  document.getElementById("flash").style.opacity=f;
+  // subtitles
+  const sub=document.getElementById("sub");
+  const c=subChunks.find(s=>t>=s.t0&&t<s.t1);
+  if(c){ sub.style.display=""; sub.innerHTML=fmt(c.text);
+    const a=clamp((t-c.t0)/.12); sub.style.transform=`scale(${.82+.18*easeOutBack(a)})`; }
+  else sub.style.display="none";
+  // elements
+  for(const {e,d} of nodes){
+    const a=life(d,t,e.t0,e.t1,{from:e.type==="hook"?"scale":"up"});
+    if(d.style.display==="none") continue;
+    if(e.type==="hook"){ const img=d.querySelector("img"); if(img){img.style.transform=`translateY(${Math.sin(t*6)*14}px) rotate(${Math.sin(t*4)*10}deg)`;}
+      // short shake right after entering
+      const s=t-e.t0; if(s<.45) d.style.transform+=` translateX(${Math.sin(s*70)*14*(1-s/.45)}px)`; }
+    if(e.type==="card"&&e.mono) typed(d.querySelector(".m"),t,e.t0+(e.typeAt||1.2),e.mono);
+    if(e.type==="compare"){ const g=e.at||[0,1.2,2.4,5];
+      ["s1","s2","s3","s4"].forEach((k,i)=>stagger(d.querySelector("."+k),t,e.t0+g[i])); }
+    if(e.type==="split"){ e.rows.forEach((r,i)=>stagger(d.querySelector(".s"+(i+1)),t,e.t0+(r.at||0))); }
+    if(e.type==="cta"){ const tap=e.t0+(e.tapAt||2.5), hand=d.querySelector(".hand"), btn=d.querySelector(".btn");
+      const p=t-tap; hand.style.transform=`translate(-30%,${p<0?Math.sin(t*8)*14:0}px) scale(${p>=0&&p<.2?.85:1})`;
+      if(p>=0){ btn.style.background="var(--ok)"; d.querySelector(".bt").innerHTML=fmt(e.buttonDone||e.button);
+        btn.style.transform=`scale(${p<.25?1+.15*Math.sin(p/.25*Math.PI):1})`; }
+      else { btn.style.background="var(--red)"; d.querySelector(".bt").innerHTML=fmt(e.button); btn.style.transform=`scale(${1+.04*Math.sin(t*7)})`; } }
+  }
+}
+window.build=build; window.setTime=setTime;
+</script>
+</body>
+</html>
