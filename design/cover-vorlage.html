@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>IT Sade Cover</title>
+<style>
+@font-face{font-family:Vazirmatn;font-weight:400;src:url(fonts/vazirmatn-arabic-400-normal.woff2) format("woff2"),url(fonts/vazirmatn-latin-400-normal.woff2) format("woff2");}
+@font-face{font-family:Vazirmatn;font-weight:700;src:url(fonts/vazirmatn-arabic-700-normal.woff2) format("woff2");}
+@font-face{font-family:Vazirmatn;font-weight:900;src:url(fonts/vazirmatn-arabic-900-normal.woff2) format("woff2");}
+@font-face{font-family:VazirLatin;font-weight:400;src:url(fonts/vazirmatn-latin-400-normal.woff2) format("woff2");}
+@font-face{font-family:VazirLatin;font-weight:700;src:url(fonts/vazirmatn-latin-700-normal.woff2) format("woff2");}
+@font-face{font-family:VazirLatin;font-weight:900;src:url(fonts/vazirmatn-latin-900-normal.woff2) format("woff2");}
+:root{--bg:#0B1220;--bg2:#13203A;--accent:#22D3EE;--hi:#FACC15;--text:#F8FAFC;--muted:#94A3B8;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;background:var(--bg);}
+body{font-family:VazirLatin,Vazirmatn,sans-serif;color:var(--text);position:relative;overflow:hidden;
+  background:radial-gradient(900px 900px at 85% 20%,#1E3A8A55,transparent 70%),radial-gradient(800px 800px at 10% 85%,#0E749055,transparent 70%),var(--bg);}
+.grid{position:absolute;inset:0;background-image:linear-gradient(#ffffff08 2px,transparent 2px),linear-gradient(90deg,#ffffff08 2px,transparent 2px);background-size:90px 90px;}
+.brand{position:absolute;top:150px;left:0;right:0;display:flex;justify-content:center;}
+.brand span{font-weight:900;font-size:52px;padding:14px 44px;border-radius:999px;background:var(--accent);color:var(--bg);}
+.series{position:absolute;top:300px;left:0;right:0;text-align:center;font-weight:700;font-size:46px;color:var(--accent);}
+.title{position:absolute;white-space:nowrap;top:50%;left:80px;right:80px;transform:translateY(-55%);text-align:center;font-weight:900;font-size:120px;line-height:1.35;}
+.title b{color:var(--hi);font-weight:900;}
+.sub{position:absolute;top:1330px;left:90px;right:90px;text-align:center;font-weight:700;font-size:54px;color:var(--muted);line-height:1.5;}
+.part{position:absolute;bottom:250px;left:0;right:0;display:flex;justify-content:center;}
+.part span{font-weight:700;font-size:48px;padding:12px 40px;border:4px solid var(--accent);border-radius:20px;color:var(--text);}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<div class="brand"><span>آی‌تی ساده</span></div>
+<div class="series" id="series"></div>
+<div class="title" id="title"></div>
+<div class="sub" id="sub"></div>
+<div class="part" id="partwrap"><span id="part"></span></div>
+<script>
+// Usage: cover-vorlage.html?series=...&title=...&sub=...&part=...
+// In "title", wrap highlighted words in *stars*; use | for a line break.
+const q=new URLSearchParams(location.search);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+document.getElementById("series").textContent=q.get("series")||"";
+document.getElementById("title").innerHTML=esc(q.get("title")||"عنوان").replace(/\*(.+?)\*/g,"<b>$1</b>").replace(/\|/g,"<br>");
+document.getElementById("sub").textContent=q.get("sub")||"";
+const p=q.get("part"); if(p) document.getElementById("part").textContent=p; else document.getElementById("partwrap").remove();
+</script>
+</body>
+</html>

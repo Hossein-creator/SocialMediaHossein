@@ -38,8 +38,8 @@ Grafikdesigner, Thumbnail-Ersteller.
 
 - Equipment: Smartphone, externes Mikrofon, PC/Laptop für Bildschirmaufnahmen
 - Schnitt: CapCut
-- Kanalname: noch offen (Vorschläge siehe strategie/strategie-v1.md)
+- Kanalname: **IT Sade / آی‌تی ساده** (Handle-Wunsch: @itsade, Verfügbarkeit noch prüfen)
 - Persönliche Story (Afghane, IT-Ausbildung in Deutschland): ja, als Nebenthema
 
 ## Offene Fragen
-- Kanalname festlegen
+- Handle @itsade auf allen Plattformen prüfen
