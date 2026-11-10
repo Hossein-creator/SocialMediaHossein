@@ -57,7 +57,7 @@ def cover(img, w, h):
     return img[y:y + h, x:x + w]
 
 # ---------------- background ----------------
-bg_path = tl.get("background") or os.path.join(here, "..", "design", "hintergruende", "workspace.png")
+bg_path = tl.get("background") or os.path.join(here, "..", "design", "hintergruende", "studio.png")
 bg_src = cv2.imread(bg_path)
 if bg_src is None:
     bg_src = np.full((H, W, 3), (40, 24, 12), np.uint8)

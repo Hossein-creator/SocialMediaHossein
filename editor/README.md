@@ -10,7 +10,7 @@
 
 ## Was ich dann mache
 1. **Transkript**: Whisper (large-v3-turbo) erkennt dein Persisch Wort für Wort mit Zeitstempeln. Ich korrigiere den Text gegen das Skript
-2. **Hintergrund**: Ich stelle dich frei (KI-Segmentierung) und setze dich vor den virtuellen Arbeitsplatz (`design/hintergruende/`), mit Tiefenunschärfe, langsamer Kamerafahrt, Schatten und Neon-Kantenlicht
+2. **Hintergrund**: Ich stelle dich frei (KI-Segmentierung) und setze dich vor dein Studio (Standard: `design/hintergruende/studio.png` – warme Holzlamellen, LED-Streifen, Regal, Neon-Schild „آی‌تی ساده“; Varianten: `studio_ohne_schild`, `studio_cyan`, `studio_quer` für YouTube 16:9; neu erzeugen mit `node design/render-studio.js`, anderes Bild per `"background"` in timeline.json), mit Tiefenunschärfe, langsamer Kamerafahrt, Schatten und Neon-Kantenlicht
 3. **Szenen** (`timeline.json`):
    - `full`: du im Bild, mit Punch-in-Zooms
    - `split`: B-Roll oben, du unten

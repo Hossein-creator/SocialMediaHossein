@@ -1,0 +1,141 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Warm studio background (dark wooden slats, orange LED strips, backlit shelf, plants).
+     Rendered with: node design/render-studio.js  ->  design/hintergruende/studio*.png
+     Query params: ?w=1080&h=1920  &sign=0 (no neon sign)  &hue=orange|cyan -->
+<style>
+@font-face{font-family:Vazirmatn;src:url(fonts/vazirmatn-arabic-700-normal.woff2) format("woff2");font-weight:700}
+@font-face{font-family:Vazirmatn;src:url(fonts/vazirmatn-latin-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0000-00FF}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:var(--w);height:var(--h);overflow:hidden;background:#140a06}
+:root{--w:1080px;--h:1920px;--led:255,150,60;--ledCore:255,226,170}
+.scene{position:absolute;inset:0;overflow:hidden;background:#1a0d07}
+/* slat walls */
+.slats{position:absolute;top:0;bottom:0;
+  background:
+   linear-gradient(90deg,rgba(0,0,0,.0),rgba(0,0,0,.0)),
+   repeating-linear-gradient(90deg,
+     #2a1309 0px,#4a2412 6px,#5c2e16 14px,#3d1d0e 22px,#1c0c05 26px,
+     rgba(var(--led),.55) 28px,#1c0c05 31px,#2a1309 34px);
+}
+.slats::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,140,60,.18),rgba(0,0,0,0) 30%,rgba(0,0,0,.35) 100%)}
+.slats.l{left:0;width:calc(var(--cx) - var(--pw)/2 - 18px)}
+.slats.r{right:0;width:calc(var(--w) - var(--cx) - var(--pw)/2 - 18px)}
+.slats.l::before,.slats.r::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 45%,rgba(255,120,40,.25),transparent 70%)}
+/* central plaster panel */
+.panel{position:absolute;top:0;bottom:0;left:calc(var(--cx) - var(--pw)/2);width:var(--pw);
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 38%,#f2b490 0%,#d98c66 45%,#9c5236 85%,#6b341f 100%);
+}
+.panel::after{content:"";position:absolute;inset:0;opacity:.35;mix-blend-mode:overlay;background-image:var(--noise)}
+.panel::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(255,170,90,.55),transparent 14%,transparent 86%,rgba(255,170,90,.55))}
+/* LED strips */
+.led{position:absolute;top:-20px;bottom:0;width:14px;border-radius:7px;
+  background:rgb(var(--ledCore));
+  box-shadow:0 0 6px 2px rgba(var(--ledCore),1),0 0 24px 8px rgba(var(--led),.95),0 0 80px 30px rgba(var(--led),.55),0 0 220px 80px rgba(var(--led),.25)}
+.led.l{left:calc(var(--cx) - var(--pw)/2 - 16px)}
+.led.r{left:calc(var(--cx) + var(--pw)/2 + 2px)}
+/* shelf */
+.shelf{position:absolute;left:calc(var(--cx) - var(--pw)/2);width:var(--pw);top:var(--sy);height:22px;
+  background:linear-gradient(#fff6ee,#e9d6c8 60%,#b99883);
+  box-shadow:0 18px 40px rgba(60,20,5,.55),0 -2px 0 rgba(255,255,255,.6) inset}
+.shelf::after{content:"";position:absolute;left:4%;right:4%;top:22px;height:90px;
+  background:radial-gradient(ellipse 50% 100% at 50% 0,rgba(255,200,130,.75),transparent 70%)}
+.item{position:absolute;bottom:calc(var(--h) - var(--sy))}
+/* neon sign */
+.sign{position:absolute;left:var(--cx);top:var(--signY);transform:translateX(-50%);white-space:nowrap;
+  font-family:Vazirmatn;font-weight:700;font-size:var(--signFs);color:#fff3e0;direction:rtl;
+  text-shadow:0 0 4px #fff,0 0 12px rgba(var(--led),1),0 0 30px rgba(var(--led),1),0 0 70px rgba(var(--led),.8),0 0 120px rgba(var(--led),.5)}
+.sign small{display:block;text-align:center;font-family:Vazirmatn;font-size:.36em;letter-spacing:.35em;direction:ltr;margin-top:.1em;opacity:.95}
+/* desk */
+.desk{position:absolute;left:0;right:0;bottom:0;height:var(--dh);
+  background:
+   linear-gradient(180deg,rgba(255,170,100,.35),transparent 18%),
+   repeating-linear-gradient(178deg,#6b3a1f 0,#7a4426 9px,#5e3119 17px,#714023 26px),
+   #6b3a1f;
+  box-shadow:0 -6px 30px rgba(0,0,0,.6)}
+.desk::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55))}
+.plant{position:absolute;filter:blur(var(--pb));}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 70% at 50% 45%,transparent 50%,rgba(10,3,0,.75) 100%)}
+.haze{position:absolute;inset:0;background:radial-gradient(ellipse 40% 30% at 50% 40%,rgba(255,170,100,.12),transparent 70%);mix-blend-mode:screen}
+</style></head><body>
+<div class="scene" id="scene"></div>
+<script>
+const q=new URLSearchParams(location.search);
+const W=+q.get("w")||1080,H=+q.get("h")||1920,portrait=H>W;
+const R=document.documentElement.style;
+R.setProperty("--w",W+"px");R.setProperty("--h",H+"px");
+if(q.get("hue")==="cyan"){R.setProperty("--led","40,200,255");R.setProperty("--ledCore","200,245,255")}
+const cx=W/2, pw=portrait?W*.56:W*.36, sy=portrait?H*.40:H*.42;
+R.setProperty("--cx",cx+"px");R.setProperty("--pw",pw+"px");R.setProperty("--sy",sy+"px");
+R.setProperty("--dh",(portrait?H*.13:H*.16)+"px");R.setProperty("--pb",(portrait?2:2)+"px");
+R.setProperty("--signY",(portrait?H*.085:H*.08)+"px");R.setProperty("--signFs",(portrait?W*.105:W*.05)+"px");
+// noise texture for plaster
+const c=document.createElement("canvas");c.width=c.height=256;const g=c.getContext("2d");const id=g.createImageData(256,256);
+let s=7;const rnd=()=>((s=(s*16807)%2147483647)/2147483647);
+for(let i=0;i<id.data.length;i+=4){const v=110+rnd()*120;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}
+g.putImageData(id,0,0);R.setProperty("--noise",`url(${c.toDataURL()})`);
+
+const sc=document.getElementById("scene");
+const add=(h)=>sc.insertAdjacentHTML("beforeend",h);
+add(`<div class="slats l"></div><div class="slats r"></div><div class="panel"></div><div class="haze"></div>`);
+if(q.get("sign")!=="0") add(`<div class="sign">آی‌تی ساده<small>IT SADE</small></div>`);
+add(`<div class="led l"></div><div class="led r"></div><div class="shelf"></div>`);
+
+const L=cx-pw/2, k=portrait?.82:H/1920*1.6; // scale for props
+// shelf props (SVG). left: router + arduino; right: books + gold geometric + robot
+const robot=`<svg width="${110*k}" height="${150*k}" viewBox="0 0 110 150">
+ <defs><linearGradient id="rb" x1="0" x2="1"><stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#b9b3ad"/></linearGradient></defs>
+ <line x1="55" y1="4" x2="55" y2="22" stroke="#ddd" stroke-width="4"/><circle cx="55" cy="6" r="6" fill="#ff8c3a"/>
+ <rect x="18" y="20" width="74" height="54" rx="16" fill="url(#rb)"/>
+ <rect x="27" y="32" width="56" height="30" rx="10" fill="#1d1d24"/>
+ <circle cx="43" cy="47" r="6" fill="#4fe3ff"/><circle cx="67" cy="47" r="6" fill="#4fe3ff"/>
+ <rect x="30" y="80" width="50" height="46" rx="10" fill="url(#rb)"/><rect x="45" y="92" width="20" height="10" rx="3" fill="#ff8c3a"/>
+ <rect x="10" y="84" width="16" height="34" rx="8" fill="#d8d2cc"/><rect x="84" y="84" width="16" height="34" rx="8" fill="#d8d2cc"/>
+ <rect x="34" y="126" width="16" height="22" rx="5" fill="#cfc8c1"/><rect x="60" y="126" width="16" height="22" rx="5" fill="#cfc8c1"/></svg>`;
+const geo=`<svg width="${120*k}" height="${120*k}" viewBox="0 0 120 120" fill="none" stroke="#e8b04a" stroke-width="3.5" stroke-linejoin="round">
+ <polygon points="60,6 112,40 96,108 24,108 8,40"/><polyline points="60,6 60,58 112,40"/><polyline points="60,58 96,108"/><polyline points="60,58 24,108"/><polyline points="60,58 8,40"/>
+ <polyline points="8,40 24,108 60,58" stroke-opacity=".6"/></svg>`;
+const books=`<svg width="${150*k}" height="${74*k}" viewBox="0 0 150 74">
+ <rect x="0" y="50" width="150" height="24" rx="2" fill="#2b2f3a"/><rect x="0" y="50" width="150" height="4" fill="#e8b04a"/>
+ <rect x="8" y="26" width="132" height="24" rx="2" fill="#8a3b22"/><rect x="8" y="26" width="132" height="3" fill="#f0c27a"/>
+ <rect x="16" y="4" width="118" height="22" rx="2" fill="#efe6da"/><text x="75" y="20" font-family="Arial" font-size="12" text-anchor="middle" fill="#3a2a20">LINUX</text></svg>`;
+const router=`<svg width="${170*k}" height="${100*k}" viewBox="0 0 170 100">
+ <rect x="30" y="0" width="7" height="58" rx="3" fill="#222"/><rect x="133" y="0" width="7" height="58" rx="3" fill="#222"/>
+ <rect x="4" y="54" width="162" height="40" rx="12" fill="#26262c"/><rect x="4" y="54" width="162" height="10" rx="5" fill="#3a3a44"/>
+ ${[0,1,2,3,4,5].map(i=>`<circle cx="${30+i*22}" cy="78" r="4.5" fill="${i<4?'#3dff8a':'#4fe3ff'}"/>`).join("")}</svg>`;
+const arduino=`<svg width="${120*k}" height="${84*k}" viewBox="0 0 120 84">
+ <g transform="rotate(-8 60 60)"><rect x="4" y="24" width="112" height="60" rx="5" fill="#0f7e8c"/>
+ <rect x="10" y="30" width="22" height="16" fill="#c0c0c0"/><rect x="50" y="46" width="40" height="12" fill="#1b1b1b"/>
+ <rect x="40" y="28" width="70" height="6" fill="#1b1b1b"/><rect x="40" y="74" width="60" height="6" fill="#1b1b1b"/>
+ <circle cx="100" cy="52" r="2.5" fill="#ff8c3a"/><text x="70" y="70" font-family="Arial" font-size="7" fill="#e9f7f9" text-anchor="middle">UNO</text></g></svg>`;
+const prop=(svg,x)=>add(`<div class="item" style="left:${x}px">${svg}</div>`);
+{const ws=[170,120,120,150,110].map(v=>v*k), gap=(pw*.94-ws.reduce((a,b)=>a+b))/4; let x=L+pw*.03;
+ [router,arduino,geo,books,robot].forEach((sv,i)=>{prop(sv,x);x+=ws[i]+gap});}
+prop(books,L+pw*.97-150*k-140*k); prop(geo,L+pw*.97-150*k-260*k); prop(robot,L+pw*.97-112*k);
+
+// plants: leaf clusters in the corners (SVG, darker, blurred = foreground depth)
+function plant(x,y,scale,flip,seed,dark){
+  let s2=seed;const r=()=>((s2=(s2*48271)%2147483647)/2147483647);
+  let leaves="";
+  for(let i=0;i<14;i++){
+    const a=(-80+r()*160)*Math.PI/180, len=180+r()*220, w=40+r()*50;
+    const ex=Math.sin(a)*len, ey=-Math.cos(a)*len*.9-60;
+    const ang=Math.atan2(ey,ex)*180/Math.PI;
+    const col=`hsl(${100+r()*35},${35+r()*20}%,${dark?7+r()*7:12+r()*12}%)`;
+    leaves+=`<path d="M0,0 Q${ex*.5},${ey*.5-30} ${ex},${ey}" stroke="#203a14" stroke-width="5" fill="none"/>`;
+    leaves+=`<g transform="translate(${ex*.55},${ey*.55}) rotate(${ang})"><path d="M-${len*.35},0 C-${len*.1},-${w} ${len*.3},-${w*.8} ${len*.55},0 C${len*.3},${w*.8} -${len*.1},${w} -${len*.35},0Z" fill="${col}"/><path d="M-${len*.33},0 L${len*.5},0" stroke="rgba(255,220,150,.18)" stroke-width="3"/></g>`;
+  }
+  add(`<svg class="plant" style="left:${x}px;top:${y}px;transform:scale(${flip?-scale:scale},${scale});transform-origin:0 0;overflow:visible" width="10" height="10"><g>${leaves}</g></svg>`);
+}
+const ps=portrait?1:H/1920*1.5;
+plant(portrait?W*.05:W*.06, portrait?H*.86:H*.84, 1.25*ps, false, 11, true);
+plant(portrait?W*.0:W*.02, portrait?H*.55:H*.62, .8*ps, false, 23, false);
+plant(portrait?W*.97:W*.95, portrait?H*.86:H*.84, 1.25*ps, true, 37, true);
+plant(portrait?W*1.0:W*.98, portrait?H*.6:H*.62, .75*ps, true, 41, false);
+add(`<div class="desk"></div><div class="vig"></div>`);
+document.title="ready";
+</script></body></html>
